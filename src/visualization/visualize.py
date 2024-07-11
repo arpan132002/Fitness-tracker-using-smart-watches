@@ -2,24 +2,18 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 
-# --------------------------------------------------------------
 # Load data
-# --------------------------------------------------------------
 
 df = pd.read_pickle("../../data/interim/01_data_processed.pkl")
 
-# --------------------------------------------------------------
 # Plot single columns
-# --------------------------------------------------------------
 
 set_df = df[df["set"] == 1]
 plt.plot(set_df["acc_y"])
 
 plt.plot(set_df["acc_y"].reset_index(drop=True))
 
-# --------------------------------------------------------------
 # Plot all exercises
-# --------------------------------------------------------------
 
 for label in df["label"].unique():
     subset = df[df["label"] == label]
@@ -36,17 +30,13 @@ for label in df["label"].unique():
     plt.legend()
     plt.show()
 
-# --------------------------------------------------------------
 # Adjust plot settings
-# --------------------------------------------------------------
 
 mpl.style.use("seaborn-v0_8-deep")
 mpl.rcParams["figure.figsize"] = (20,5)
 mpl.rcParams["figure.dpi"] = 100
 
-# --------------------------------------------------------------
 # Compare medium vs. heavy sets
-# --------------------------------------------------------------
 
 category_df = df.query("label == 'squat'").query("participant == 'A'").reset_index()
 
@@ -58,9 +48,7 @@ plt.legend()
 plt.show()
 # This basically shows us that during heavy squats "acc_y" has bigger crests and troughs both
 
-# --------------------------------------------------------------
 # Compare participants
-# --------------------------------------------------------------
 
 participant_df = df.query("label == 'bench'").sort_values("participant").reset_index()
 
@@ -71,9 +59,7 @@ ax.set_ylabel("acc_y")
 plt.legend()
 plt.show()
 
-# --------------------------------------------------------------
 # Plot multiple axis
-# --------------------------------------------------------------
 
 label = "squat"
 participant = "A"
@@ -86,9 +72,7 @@ ax.set_ylabel("acc_measures")
 plt.legend()
 plt.show()
 
-# --------------------------------------------------------------
 # Create a loop to plot all combinations per sensor
-# --------------------------------------------------------------
 
 labels = df["label"].unique()
 participants = df["participant"].unique()
@@ -129,9 +113,7 @@ for label in labels:
             plt.title(f"{label} ({participant})".title())
             plt.show()
 
-# --------------------------------------------------------------
 # Combine plots in one figure
-# --------------------------------------------------------------
 
 label = "row"
 participant = "A"
@@ -146,9 +128,7 @@ ax[0].legend(loc="upper center", bbox_to_anchor=(0.5,1.15), ncol=3, fancybox=Tru
 ax[1].legend(loc="upper center", bbox_to_anchor=(0.5,1.15), ncol=3, fancybox=True, shadow=True)
 ax[1].set_xlabels("samples")
 
-# --------------------------------------------------------------
 # Loop over all combinations and export for both sensors
-# --------------------------------------------------------------
 
 labels = df["label"].unique()
 participants = df["participant"].unique()

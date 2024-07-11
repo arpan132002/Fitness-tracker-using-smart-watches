@@ -5,9 +5,7 @@ from DataTransformation import LowPassFilter, PrincipalComponentAnalysis
 from TemporalAbstraction import NumericalAbstraction
 from sklearn.cluster import KMeans
 
-# --------------------------------------------------------------
 # Load data
-# --------------------------------------------------------------
 
 df = pd.read_pickle("../../data/interim/02_outliers_removed_chauvenets.pkl")
 
@@ -18,18 +16,14 @@ plt.rcParams["figure.figsize"] = (20,5)
 plt.rcParams["figure.dpi"] = 100
 plt.rcParams["lines.linewidth"] = 2
 
-# --------------------------------------------------------------
 # Dealing with missing values (imputation)
-# --------------------------------------------------------------
 
 df.info()
 
 for col in predictor_columns:
     df[col] = df[col].interpolate()
 
-# --------------------------------------------------------------
 # Calculating set duration
-# --------------------------------------------------------------
 
 df[df["set"] == 25]["acc_y"].plot()
 df[df["set"] == 50]["acc_y"].plot()
@@ -50,9 +44,7 @@ duration_df = df.groupby(["category"])["duration"].mean()
 duration_df.iloc[0] / 5
 duration_df.iloc[1] / 10
 
-# --------------------------------------------------------------
 # Butterworth lowpass filter
-# --------------------------------------------------------------
 
 df_lowpass = df.copy()
 LowPass = LowPassFilter()
@@ -76,9 +68,7 @@ for col in predictor_columns:
     df_lowpass[col] = df_lowpass[col + "_lowpass"]
     del df_lowpass[col + "_lowpass"]
 
-# --------------------------------------------------------------
 # Principal component analysis PCA
-# --------------------------------------------------------------
 
 df_pca = df_lowpass.copy()
 PCA = PrincipalComponentAnalysis()
@@ -96,9 +86,7 @@ df_pca = PCA.apply_pca(df_pca, predictor_columns, 3)
 subset = df_pca[df_pca["set"] == 35]
 subset[["pca_1", "pca_2", "pca_3"]].plot()
 
-# --------------------------------------------------------------
 # Sum of squares attributes
-# --------------------------------------------------------------
 
 df_squared = df_pca.copy()
 
@@ -112,9 +100,7 @@ subset = df_squared[df_squared["set"] == 14]
 
 subset[["acc_r", "gyr_r"]].plot(subplots=True)
 
-# --------------------------------------------------------------
 # Temporal abstraction
-# --------------------------------------------------------------
 
 df_temporal = df_squared.copy()
 NumAbs = NumericalAbstraction()
@@ -140,9 +126,7 @@ df_temporal = pd.concat(df_temporal_list)
 subset[["acc_y", "acc_ytemp_mean_ws_5", "acc_ytemp_std_ws_5"]].plot()
 subset[["gyr_y", "gyr_ytemp_mean_ws_5", "gyr_ytemp_std_ws_5"]].plot()
 
-# --------------------------------------------------------------
 # Frequency features
-# --------------------------------------------------------------
 
 df_freq = df_temporal.copy().reset_index()
 FreqAbs = FourierTransformation()
@@ -152,7 +136,7 @@ ws = int (1000/200)
 
 df_freq = FreqAbs.abstract_frequency(df_freq, ["acc_y"], ws, fs)
 
-#Visualize Results
+# Visualize Results
 subset = df_freq[df_freq["set"] == 15]
 subset[["acc_y"]].plot()
 subset[
@@ -174,16 +158,12 @@ for s in df_freq["set"].unique():
 
 df_freq = pd.concat(df_freq_list).set_index("epoch (ms)", drop=True)
 
-# --------------------------------------------------------------
 # Dealing with overlapping windows
-# --------------------------------------------------------------
 
 df_freq = df_freq.dropna()
 df_freq = df_freq.iloc[::2]
 
-# --------------------------------------------------------------
 # Clustering
-# --------------------------------------------------------------
 
 df_cluster = df.copy()
 
@@ -231,8 +211,6 @@ ax.set_zlabel("Z-axis")
 plt.legend()
 plt.show()
 
-# --------------------------------------------------------------
 # Export dataset
-# --------------------------------------------------------------
 
 df_cluster.to_pickle("../../data/interim/03_data_features.pkl")
