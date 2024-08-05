@@ -14,4 +14,4 @@ In this project, I created a fitness tracker application that takes acceleromete
 ## Requirements
 
 - Python 3.7+
-- Libraries: pandas, numpy, scikit-learn, matplotlib, etc.
+- Libraries: pandas, numpy, scikit-learn, tensorflow, matplotlib, etc.
